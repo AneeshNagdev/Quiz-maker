@@ -109,56 +109,92 @@ function handleGenerateText() {
 }
 
 function parseRawTextToJSON(rawText) {
-    const blocks = rawText.split(/Question\s*\d+\.\s*/i).filter(b => b.trim());
+    const lines = rawText.split('\n').map(l => l.trim()).filter(l => l);
     const data = [];
+    
+    let currentBlock = null;
+    
+    // Highly versatile edge-case regex matching
+    const questionHeaderRegex = /^(?:Question|Q|Ques)?\s*\d+[\.\:\-\)]?\s*/i;
+    const optionRegex = /^[a-h][\.\)]\s+/i;
+    const answerRegex = /^(?:Correct )?(?:Answer|Ans|Option)[\:\-]?\s*([a-h])/i;
 
-    blocks.forEach((block, index) => {
-        const lines = block.split('\n').map(l => l.trim()).filter(l => l);
+    for (let i = 0; i < lines.length; i++) {
+        let line = lines[i];
+        let isNewQuestionHeader = false;
         
-        let questionTextLines = [];
-        let options = [];
-        let answer = "";
-        let parsingMode = "question";
+        if (questionHeaderRegex.test(line)) {
+            if (!currentBlock || currentBlock.answer) {
+                isNewQuestionHeader = true;
+            }
+        } else if (!currentBlock || currentBlock.answer) {
+            isNewQuestionHeader = true;
+        }
 
-        for (let i = 0; i < lines.length; i++) {
-            const line = lines[i];
+        if (isNewQuestionHeader) {
+            if (currentBlock && currentBlock.question.length > 0 && currentBlock.options.length > 0 && currentBlock.answer) {
+                data.push(currentBlock);
+            }
             
-            if (line.match(/^[A-Z]\.\s+/i)) {
-                parsingMode = "options";
-                const letter = line.charAt(0).toUpperCase();
-                const text = line.substring(2).trim();
-                options.push([letter, text]);
-            } else if (line.match(/^Answer:\s*[A-Z]/i)) {
-                answer = line.split(':')[1].trim().toUpperCase();
-            } else if (parsingMode === "question") {
-                questionTextLines.push(line);
+            let qText = line.replace(questionHeaderRegex, '').trim();
+            
+            currentBlock = {
+                question: qText ? [qText] : [],
+                options: [],
+                answer: null,
+                parsingMode: "question"
+            };
+            continue;
+        }
+        
+        if (answerRegex.test(line)) {
+            const match = line.match(answerRegex);
+            if (match && match[1]) {
+                currentBlock.answer = match[1].toUpperCase();
+            }
+            currentBlock.parsingMode = "answer";
+        } else if (optionRegex.test(line)) {
+            currentBlock.parsingMode = "options";
+            const letter = line.charAt(0).toUpperCase();
+            // Handle variants like "A. " or "A) "
+            const text = line.replace(/^[a-h][\.\)]\s*/i, '').trim();
+            currentBlock.options.push([letter, text]);
+        } else {
+            // Continuation line
+            if (currentBlock.parsingMode === "question") {
+                currentBlock.question.push(line);
+            } else if (currentBlock.parsingMode === "options" && currentBlock.options.length > 0) {
+                currentBlock.options[currentBlock.options.length - 1][1] += " " + line;
             }
         }
-
-        const questionText = questionTextLines.join(' ');
-        
-        if (!questionText || options.length === 0 || !answer) {
-            throw new Error(`Failed to parse Question block. Please make sure you follow the required format exactly.`);
-        }
-
-        const explanations = {};
-        options.forEach(opt => {
-            explanations[opt[0]] = opt[0] === answer ? "Correct." : "Incorrect.";
-        });
-
-        data.push({
-            question: questionText,
-            options: options,
-            answer: answer,
-            explanations: explanations
-        });
-    });
-
-    if (data.length === 0) {
-        throw new Error("No valid questions found.");
     }
     
-    return data;
+    // Flush final block
+    if (currentBlock && currentBlock.question.length > 0 && currentBlock.options.length > 0 && currentBlock.answer) {
+        data.push(currentBlock);
+    }
+    
+    const finalData = data.map((block, index) => {
+        const qTexts = block.question.join(' ');
+        
+        const explanations = {};
+        block.options.forEach(opt => {
+            explanations[opt[0]] = opt[0] === block.answer ? "Correct answer." : "Incorrect.";
+        });
+        
+        return {
+            question: qTexts || "Question " + (index + 1),
+            options: block.options,
+            answer: block.answer,
+            explanations: explanations
+        };
+    });
+
+    if (finalData.length === 0) {
+        throw new Error("Could not parse. Please ensure inputs contain clear Questions, Options (A), B), etc), and 'Answer: X'.");
+    }
+    
+    return finalData;
 }
 
 function validateQuizData(data) {
