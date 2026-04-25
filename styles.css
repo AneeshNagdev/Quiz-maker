@@ -444,23 +444,34 @@ body {
 
 .question-grid {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 0.5rem;
 }
 
 .nav-btn {
-    aspect-ratio: 1;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    border-radius: 4px;
+    padding: 0.5rem 0.25rem;
+    border-radius: 6px;
     border: 1px solid var(--border-color);
     background-color: var(--option-bg);
     color: var(--text-main);
-    font-size: 0.85rem;
-    font-weight: 500;
     cursor: pointer;
     transition: var(--transition);
+}
+
+.nav-num {
+    font-size: 0.95rem;
+    font-weight: 500;
+    margin-bottom: 0.25rem;
+}
+
+.nav-status {
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: var(--text-muted);
 }
 
 .nav-btn:hover {
@@ -469,14 +480,20 @@ body {
 }
 
 .nav-btn.attempted {
-    background-color: var(--primary);
-    color: #ffffff;
-    border-color: var(--primary-hover);
+    background-color: var(--option-bg);
+    color: var(--text-main);
+    border-color: var(--border-color);
+}
+
+.nav-btn.attempted .nav-status {
+    color: var(--correct-border);
+    font-size: 1rem;
 }
 
 .nav-btn.active {
-    outline: 2px solid var(--text-main);
-    outline-offset: 2px;
+    border-color: var(--primary);
+    background-color: var(--option-hover);
+    outline: none;
 }
 
 .card-footer .btn {

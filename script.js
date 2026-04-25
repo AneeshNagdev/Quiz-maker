@@ -261,7 +261,10 @@ function initQuiz(data) {
     state.quizData.forEach((_, index) => {
         const btn = document.createElement('button');
         btn.className = 'nav-btn';
-        btn.textContent = index + 1;
+        btn.innerHTML = `
+            <span class="nav-num">${index + 1}</span>
+            <span class="nav-status">--</span>
+        `;
         btn.onclick = () => {
             state.currentQuestionIndex = index;
             renderQuestion();
@@ -285,7 +288,15 @@ function renderQuestion() {
     
     Array.from(elements.questionGrid.children).forEach((btn, idx) => {
         btn.classList.toggle('active', idx === state.currentQuestionIndex);
-        btn.classList.toggle('attempted', !!state.quizData[idx].userAnswer);
+        const attempted = !!state.quizData[idx].userAnswer;
+        btn.classList.toggle('attempted', attempted);
+        
+        const statusSpan = btn.querySelector('.nav-status');
+        if (attempted) {
+            statusSpan.innerHTML = '&#10003;';
+        } else {
+            statusSpan.textContent = '--';
+        }
     });
 
     elements.qNum.textContent = state.currentQuestionIndex + 1;
@@ -357,7 +368,9 @@ function handleOptionClick(selectedId, selectedBtn) {
     state.score = state.quizData.filter(q => q.isCorrect).length;
     updateScoreDisplay();
     
-    elements.questionGrid.children[state.currentQuestionIndex].classList.add('attempted');
+    const activeBtn = elements.questionGrid.children[state.currentQuestionIndex];
+    activeBtn.classList.add('attempted');
+    activeBtn.querySelector('.nav-status').innerHTML = '&#10003;';
     
     if (isCorrect) {
         selectedBtn.classList.add('correct');
