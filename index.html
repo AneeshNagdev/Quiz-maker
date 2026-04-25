@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Quiz</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <h1>Interactive Quiz</h1>
+            <div class="header-controls">
+                <div id="score-container" class="hidden">
+                    <span class="score-badge">Score: <span id="current-score">0</span> / <span id="total-questions">0</span></span>
+                </div>
+                <button id="theme-toggle" class="icon-btn" aria-label="Toggle Dark Mode">
+                    <svg id="moon-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                    <svg id="sun-icon" class="hidden" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- Upload View -->
+        <div id="upload-view" class="view active-view">
+            <div class="upload-card">
+                <div class="upload-icon">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="17 8 12 3 7 8"></polyline>
+                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                    </svg>
+                </div>
+                <h2>Upload Quiz Data</h2>
+                <p>Select a JSON file containing your questions, options, and explanations.</p>
+                <div class="file-input-wrapper">
+                    <button class="btn primary-btn">Choose File</button>
+                    <input type="file" id="json-upload" accept=".json" />
+                </div>
+                <div id="upload-error" class="error-msg hidden"></div>
+            </div>
+        </div>
+
+        <!-- Quiz View -->
+        <div id="quiz-view" class="view">
+            <div class="quiz-card">
+                <div class="card-header">
+                    <span class="question-number">Question <span id="q-num">1</span> of <span id="q-total"></span></span>
+                </div>
+                <h2 id="question-text" class="question-text"></h2>
+                
+                <div id="options-container" class="options-container">
+                    <!-- Options injected here -->
+                </div>
+
+                <div id="explanation-container" class="explanation-container hidden">
+                    <div class="explanation-header">
+                        <svg class="info-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="16" x2="12" y2="12"></line>
+                            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                        </svg>
+                        <h3>Explanation</h3>
+                    </div>
+                    <p id="explanation-text"></p>
+                </div>
+
+                <div class="card-footer hidden" id="card-footer">
+                    <button id="next-btn" class="btn primary-btn">Next Question</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results View -->
+        <div id="results-view" class="view">
+            <div class="results-card">
+                <h2>Quiz Completed!</h2>
+                <div class="final-score">
+                    <span class="score-circle">
+                        <span id="final-score-val"></span>
+                        <span class="score-divider">/</span>
+                        <span id="final-score-total"></span>
+                    </span>
+                </div>
+                <p id="results-message"></p>
+                <button id="restart-btn" class="btn primary-btn mt-4">Restart Quiz</button>
+                <button id="upload-another-btn" class="btn secondary-btn mt-2">Upload New File</button>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
