@@ -266,12 +266,24 @@ body {
 }
 
 .secondary-btn {
-    background-color: #f3f4f6;
-    color: var(--text-main);
+    background-color: #64748b;
+    color: #ffffff;
+    box-shadow: var(--shadow-sm);
 }
 
 .secondary-btn:hover {
-    background-color: #e5e7eb;
+    background-color: #475569;
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+
+body.dark-mode .secondary-btn {
+    background-color: #3f3f46;
+    color: #ffffff;
+}
+
+body.dark-mode .secondary-btn:hover {
+    background-color: #52525b;
 }
 
 /* Quiz Style */
