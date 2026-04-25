@@ -67,30 +67,44 @@
 
         <!-- Quiz View -->
         <div id="quiz-view" class="view">
-            <div class="quiz-card">
-                <div class="card-header">
-                    <span class="question-number">Question <span id="q-num">1</span> of <span id="q-total"></span></span>
-                </div>
-                <h2 id="question-text" class="question-text"></h2>
-                
-                <div id="options-container" class="options-container">
-                    <!-- Options injected here -->
-                </div>
+            <div class="quiz-layout">
+                <div class="quiz-main">
+                    <div class="quiz-card">
+                        <div class="card-header">
+                            <span class="question-number">Question <span id="q-num">1</span> of <span id="q-total"></span></span>
+                        </div>
+                        <h2 id="question-text" class="question-text"></h2>
+                        
+                        <div id="options-container" class="options-container">
+                            <!-- Options injected here -->
+                        </div>
 
-                <div id="explanation-container" class="explanation-container hidden">
-                    <div class="explanation-header">
-                        <svg class="info-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="12" cy="12" r="10"></circle>
-                            <line x1="12" y1="16" x2="12" y2="12"></line>
-                            <line x1="12" y1="8" x2="12.01" y2="8"></line>
-                        </svg>
-                        <h3>Explanation</h3>
+                        <div id="explanation-container" class="explanation-container hidden">
+                            <div class="explanation-header">
+                                <svg class="info-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                                </svg>
+                                <h3>Explanation</h3>
+                            </div>
+                            <p id="explanation-text"></p>
+                        </div>
+
+                        <div class="card-footer" id="card-footer">
+                            <button id="prev-btn" class="btn secondary-btn hidden">Previous</button>
+                            <button id="next-btn" class="btn primary-btn hidden">Next</button>
+                        </div>
                     </div>
-                    <p id="explanation-text"></p>
                 </div>
-
-                <div class="card-footer hidden" id="card-footer">
-                    <button id="next-btn" class="btn primary-btn">Next Question</button>
+                
+                <div class="quiz-sidebar-container">
+                    <div class="quiz-sidebar-card">
+                        <h3 class="sidebar-title">Question Grid</h3>
+                        <div id="question-grid" class="question-grid">
+                            <!-- Navigation buttons injected here -->
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

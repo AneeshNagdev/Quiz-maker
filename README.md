@@ -2,6 +2,8 @@
 
 **🚀 Live Demo:** You can use the web app directly in your browser here: [https://aneeshnagdev.github.io/Quiz-maker/](https://aneeshnagdev.github.io/Quiz-maker/)
 
+![Interactive Quiz Preview](preview.png)
+
 A clean, zero-dependency interactive web quiz application with a classical Dark Mode design. Create and take interactive mock exams effortlessly straight from your browser. 
 
 ## Features

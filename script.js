@@ -20,6 +20,8 @@ const elements = {
     explanationHeader: document.querySelector('.explanation-header'),
     cardFooter: document.getElementById('card-footer'),
     nextBtn: document.getElementById('next-btn'),
+    prevBtn: document.getElementById('prev-btn'),
+    questionGrid: document.getElementById('question-grid'),
     finalScoreVal: document.getElementById('final-score-val'),
     finalScoreTotal: document.getElementById('final-score-total'),
     resultsMessage: document.getElementById('results-message'),
@@ -44,6 +46,7 @@ let state = {
 elements.fileInput.addEventListener('change', handleFileUpload);
 elements.generateTextBtn.addEventListener('click', handleGenerateText);
 elements.nextBtn.addEventListener('click', handleNextQuestion);
+elements.prevBtn.addEventListener('click', handlePrevQuestion);
 elements.restartBtn.addEventListener('click', restartQuiz);
 elements.uploadAnotherBtn.addEventListener('click', () => {
     switchView('upload');
@@ -254,6 +257,18 @@ function initQuiz(data) {
     state.currentQuestionIndex = 0;
     state.score = 0;
     
+    elements.questionGrid.innerHTML = '';
+    state.quizData.forEach((_, index) => {
+        const btn = document.createElement('button');
+        btn.className = 'nav-btn';
+        btn.textContent = index + 1;
+        btn.onclick = () => {
+            state.currentQuestionIndex = index;
+            renderQuestion();
+        };
+        elements.questionGrid.appendChild(btn);
+    });
+    
     elements.uploadError.classList.add('hidden');
     elements.totalQuestions.textContent = state.quizData.length;
     elements.qTotal.textContent = state.quizData.length;
@@ -265,16 +280,18 @@ function initQuiz(data) {
 }
 
 function renderQuestion() {
-    state.hasAnswered = false;
     const qData = state.quizData[state.currentQuestionIndex];
+    state.hasAnswered = !!qData.userAnswer;
     
+    Array.from(elements.questionGrid.children).forEach((btn, idx) => {
+        btn.classList.toggle('active', idx === state.currentQuestionIndex);
+        btn.classList.toggle('attempted', !!state.quizData[idx].userAnswer);
+    });
+
     elements.qNum.textContent = state.currentQuestionIndex + 1;
     elements.questionText.textContent = qData.question;
     
-    // Clear previous options and explanations
     elements.optionsContainer.innerHTML = '';
-    elements.explanationContainer.classList.add('hidden');
-    elements.cardFooter.classList.add('hidden');
 
     qData.options.forEach(opt => {
         const optionId = opt[0];
@@ -289,31 +306,68 @@ function renderQuestion() {
             <span class="option-text">${optionText}</span>
         `;
         
+        if (qData.userAnswer) {
+            btn.disabled = true;
+            if (optionId === qData.answer) {
+                btn.classList.add('correct');
+            } else if (optionId === qData.userAnswer) {
+                btn.classList.add('incorrect');
+            } else {
+                btn.classList.add('disabled-unselected');
+            }
+        }
+        
         btn.addEventListener('click', () => handleOptionClick(optionId, btn));
         elements.optionsContainer.appendChild(btn);
     });
+    
+    if (qData.userAnswer) {
+        const isCorrect = qData.userAnswer === qData.answer;
+        elements.explanationText.textContent = qData.explanations[qData.userAnswer];
+        elements.explanationContainer.style.borderLeftColor = isCorrect ? 'var(--correct-border)' : 'var(--incorrect-border)';
+        const icon = elements.explanationContainer.querySelector('.info-icon');
+        icon.style.color = isCorrect ? 'var(--correct-text)' : 'var(--incorrect-text)';
+        elements.explanationHeader.style.color = isCorrect ? 'var(--correct-text)' : 'var(--incorrect-text)';
+        elements.explanationContainer.classList.remove('hidden');
+    } else {
+        elements.explanationContainer.classList.add('hidden');
+    }
+
+    elements.prevBtn.classList.toggle('hidden', state.currentQuestionIndex === 0);
+    elements.nextBtn.classList.remove('hidden');
+    
+    if (state.quizData.every(q => q.userAnswer)) {
+        elements.nextBtn.textContent = 'View Results';
+    } else if (state.currentQuestionIndex === state.quizData.length - 1) {
+        elements.nextBtn.textContent = 'Back to Start';
+    } else {
+        elements.nextBtn.textContent = 'Next';
+    }
 }
 
 function handleOptionClick(selectedId, selectedBtn) {
-    if (state.hasAnswered) return;
-    state.hasAnswered = true;
-    
     const qData = state.quizData[state.currentQuestionIndex];
+    if (qData.userAnswer) return;
+    
+    state.hasAnswered = true;
     const isCorrect = selectedId === qData.answer;
+    qData.userAnswer = selectedId;
+    qData.isCorrect = isCorrect;
+    
+    state.score = state.quizData.filter(q => q.isCorrect).length;
+    updateScoreDisplay();
+    
+    elements.questionGrid.children[state.currentQuestionIndex].classList.add('attempted');
     
     if (isCorrect) {
-        state.score++;
-        updateScoreDisplay();
         selectedBtn.classList.add('correct');
     } else {
         selectedBtn.classList.add('incorrect');
-        // Highlight the correct answer
         const allBtns = Array.from(elements.optionsContainer.children);
         const correctBtn = allBtns.find(btn => btn.dataset.id === qData.answer);
         if (correctBtn) correctBtn.classList.add('correct');
     }
     
-    // Disable all buttons and dim unselected
     const allBtns = Array.from(elements.optionsContainer.children);
     allBtns.forEach(btn => {
         btn.disabled = true;
@@ -322,32 +376,40 @@ function handleOptionClick(selectedId, selectedBtn) {
         }
     });
 
-    // Show explanation for the selected option
     elements.explanationText.textContent = qData.explanations[selectedId];
-    
-    // Theme the explanation based on whether it was correct or incorrect
     elements.explanationContainer.style.borderLeftColor = isCorrect ? 'var(--correct-border)' : 'var(--incorrect-border)';
     const icon = elements.explanationContainer.querySelector('.info-icon');
     icon.style.color = isCorrect ? 'var(--correct-text)' : 'var(--incorrect-text)';
     elements.explanationHeader.style.color = isCorrect ? 'var(--correct-text)' : 'var(--incorrect-text)';
-    
     elements.explanationContainer.classList.remove('hidden');
     
-    // Show next button
-    if (state.currentQuestionIndex === state.quizData.length - 1) {
-        elements.nextBtn.textContent = 'Finish Quiz';
-    } else {
-        elements.nextBtn.textContent = 'Next Question';
+    if (state.quizData.every(q => q.userAnswer)) {
+        elements.nextBtn.textContent = 'View Results';
     }
-    elements.cardFooter.classList.remove('hidden');
+}
+
+function handlePrevQuestion() {
+    if (state.currentQuestionIndex > 0) {
+        state.currentQuestionIndex--;
+        renderQuestion();
+    }
 }
 
 function handleNextQuestion() {
+    if (state.quizData.every(q => q.userAnswer)) {
+        showResults();
+        return;
+    }
+    
     if (state.currentQuestionIndex < state.quizData.length - 1) {
         state.currentQuestionIndex++;
         renderQuestion();
     } else {
-        showResults();
+        const firstUnanswered = state.quizData.findIndex(q => !q.userAnswer);
+        if (firstUnanswered !== -1) {
+            state.currentQuestionIndex = firstUnanswered;
+            renderQuestion();
+        }
     }
 }
 
