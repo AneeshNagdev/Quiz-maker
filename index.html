@@ -17,30 +17,52 @@
                     <span class="score-badge">Score: <span id="current-score">0</span> / <span id="total-questions">0</span></span>
                 </div>
                 <button id="theme-toggle" class="icon-btn" aria-label="Toggle Dark Mode">
-                    <svg id="moon-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
-                    <svg id="sun-icon" class="hidden" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                    <svg id="moon-icon" class="hidden" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                    <svg id="sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
                 </button>
             </div>
         </header>
 
         <!-- Upload View -->
         <div id="upload-view" class="view active-view">
-            <div class="upload-card">
-                <div class="upload-icon">
-                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                        <polyline points="17 8 12 3 7 8"></polyline>
-                        <line x1="12" y1="3" x2="12" y2="15"></line>
-                    </svg>
+            <div class="upload-container">
+                <!-- File Upload Card -->
+                <div class="upload-card">
+                    <div class="upload-icon">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="17 8 12 3 7 8"></polyline>
+                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                        </svg>
+                    </div>
+                    <h2>Upload JSON File</h2>
+                    <p>Select a formatted .json file.</p>
+                    <div class="file-input-wrapper">
+                        <button class="btn primary-btn">Choose File</button>
+                        <input type="file" id="json-upload" accept=".json" />
+                    </div>
                 </div>
-                <h2>Upload Quiz Data</h2>
-                <p>Select a JSON file containing your questions, options, and explanations.</p>
-                <div class="file-input-wrapper">
-                    <button class="btn primary-btn">Choose File</button>
-                    <input type="file" id="json-upload" accept=".json" />
+
+                <div class="upload-divider">OR</div>
+
+                <!-- Text Paste Card -->
+                <div class="upload-card">
+                    <div class="upload-icon">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>
+                    </div>
+                    <h2>Paste Raw Text</h2>
+                    <p>Paste questions directly in the standard text format.</p>
+                    <textarea id="raw-text-input" class="text-input" placeholder="Question 1.&#10;&#10;What is...&#10;A. Option&#10;B. Option&#10;Answer: B"></textarea>
+                    <button id="generate-text-btn" class="btn primary-btn mt-2">Generate Quiz</button>
                 </div>
-                <div id="upload-error" class="error-msg hidden"></div>
             </div>
+            <div id="upload-error" class="error-msg hidden"></div>
         </div>
 
         <!-- Quiz View -->
