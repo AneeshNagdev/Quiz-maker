@@ -31,7 +31,9 @@ const elements = {
     moonIcon: document.getElementById('moon-icon'),
     sunIcon: document.getElementById('sun-icon'),
     rawTextInput: document.getElementById('raw-text-input'),
-    generateTextBtn: document.getElementById('generate-text-btn')
+    generateTextBtn: document.getElementById('generate-text-btn'),
+    reviewBtn: document.getElementById('review-btn'),
+    highlightToggle: document.getElementById('highlight-toggle')
 };
 
 // Application State
@@ -39,7 +41,9 @@ let state = {
     quizData: [],
     currentQuestionIndex: 0,
     score: 0,
-    hasAnswered: false
+    hasAnswered: false,
+    highlightMode: false,
+    isReviewMode: false
 };
 
 // Event Listeners
@@ -48,6 +52,8 @@ elements.generateTextBtn.addEventListener('click', handleGenerateText);
 elements.nextBtn.addEventListener('click', handleNextQuestion);
 elements.prevBtn.addEventListener('click', handlePrevQuestion);
 elements.restartBtn.addEventListener('click', restartQuiz);
+elements.reviewBtn.addEventListener('click', reviewQuiz);
+elements.highlightToggle.addEventListener('click', toggleHighlightMode);
 elements.uploadAnotherBtn.addEventListener('click', () => {
     switchView('upload');
     elements.fileInput.value = '';
@@ -56,6 +62,38 @@ elements.uploadAnotherBtn.addEventListener('click', () => {
 elements.themeToggle.addEventListener('click', toggleTheme);
 
 // Functions
+function toggleHighlightMode() {
+    state.highlightMode = !state.highlightMode;
+    elements.highlightToggle.classList.toggle('active', state.highlightMode);
+}
+
+function reviewQuiz() {
+    state.isReviewMode = true;
+    state.currentQuestionIndex = 0;
+    switchView('quiz');
+    elements.scoreContainer.classList.remove('hidden');
+    renderQuestion();
+}
+
+function saveCurrentHighlights() {
+    const qData = state.quizData[state.currentQuestionIndex];
+    if (!qData) return;
+    qData.questionHtml = elements.questionText.innerHTML;
+    
+    const options = elements.optionsContainer.querySelectorAll('.option-btn');
+    options.forEach(btn => {
+        const optId = btn.dataset.id;
+        const optData = qData.options.find(o => o[0] === optId);
+        if (optData) {
+            optData[2] = btn.querySelector('.option-text').innerHTML;
+        }
+    });
+    
+    if (qData.userAnswer) {
+         qData.explanationHtml = elements.explanationText.innerHTML;
+    }
+}
+
 function toggleTheme() {
     document.body.classList.toggle('dark-mode');
     const isDark = document.body.classList.contains('dark-mode');
@@ -256,6 +294,7 @@ function initQuiz(data) {
     state.quizData = processAndShuffleQuizData(data);
     state.currentQuestionIndex = 0;
     state.score = 0;
+    state.isReviewMode = false;
     
     elements.questionGrid.innerHTML = '';
     state.quizData.forEach((_, index) => {
@@ -266,6 +305,7 @@ function initQuiz(data) {
             <span class="nav-status">--</span>
         `;
         btn.onclick = () => {
+            saveCurrentHighlights();
             state.currentQuestionIndex = index;
             renderQuestion();
         };
@@ -293,20 +333,24 @@ function renderQuestion() {
         
         const statusSpan = btn.querySelector('.nav-status');
         if (attempted) {
-            statusSpan.innerHTML = '&#10003;';
+            const isCorrect = state.quizData[idx].isCorrect;
+            statusSpan.innerHTML = isCorrect ? '&#10003;' : '&#10007;';
+            btn.classList.add(isCorrect ? 'nav-correct' : 'nav-incorrect');
         } else {
             statusSpan.textContent = '--';
+            btn.classList.remove('nav-correct', 'nav-incorrect');
         }
     });
 
     elements.qNum.textContent = state.currentQuestionIndex + 1;
-    elements.questionText.textContent = qData.question;
+    elements.questionText.innerHTML = qData.questionHtml || qData.question;
     
     elements.optionsContainer.innerHTML = '';
 
     qData.options.forEach(opt => {
         const optionId = opt[0];
         const optionText = opt[1];
+        const optionHtml = opt[2] || optionText;
         
         const btn = document.createElement('button');
         btn.className = 'option-btn';
@@ -314,7 +358,7 @@ function renderQuestion() {
         
         btn.innerHTML = `
             <span class="option-letter">${optionId}</span>
-            <span class="option-text">${optionText}</span>
+            <span class="option-text">${optionHtml}</span>
         `;
         
         if (qData.userAnswer) {
@@ -334,7 +378,7 @@ function renderQuestion() {
     
     if (qData.userAnswer) {
         const isCorrect = qData.userAnswer === qData.answer;
-        elements.explanationText.textContent = qData.explanations[qData.userAnswer];
+        elements.explanationText.innerHTML = qData.explanationHtml || qData.explanations[qData.userAnswer];
         elements.explanationContainer.style.borderLeftColor = isCorrect ? 'var(--correct-border)' : 'var(--incorrect-border)';
         const icon = elements.explanationContainer.querySelector('.info-icon');
         icon.style.color = isCorrect ? 'var(--correct-text)' : 'var(--incorrect-text)';
@@ -348,7 +392,11 @@ function renderQuestion() {
     elements.nextBtn.classList.remove('hidden');
     
     if (state.quizData.every(q => q.userAnswer)) {
-        elements.nextBtn.textContent = 'View Results';
+        if (state.currentQuestionIndex === state.quizData.length - 1) {
+            elements.nextBtn.textContent = 'View Results';
+        } else {
+            elements.nextBtn.textContent = 'Next';
+        }
     } else if (state.currentQuestionIndex === state.quizData.length - 1) {
         elements.nextBtn.textContent = 'Back to Start';
     } else {
@@ -370,7 +418,8 @@ function handleOptionClick(selectedId, selectedBtn) {
     
     const activeBtn = elements.questionGrid.children[state.currentQuestionIndex];
     activeBtn.classList.add('attempted');
-    activeBtn.querySelector('.nav-status').innerHTML = '&#10003;';
+    activeBtn.querySelector('.nav-status').innerHTML = isCorrect ? '&#10003;' : '&#10007;';
+    activeBtn.classList.add(isCorrect ? 'nav-correct' : 'nav-incorrect');
     
     if (isCorrect) {
         selectedBtn.classList.add('correct');
@@ -397,19 +446,25 @@ function handleOptionClick(selectedId, selectedBtn) {
     elements.explanationContainer.classList.remove('hidden');
     
     if (state.quizData.every(q => q.userAnswer)) {
-        elements.nextBtn.textContent = 'View Results';
+        if (state.currentQuestionIndex === state.quizData.length - 1) {
+            elements.nextBtn.textContent = 'View Results';
+        } else {
+            elements.nextBtn.textContent = 'Next';
+        }
     }
 }
 
 function handlePrevQuestion() {
     if (state.currentQuestionIndex > 0) {
+        saveCurrentHighlights();
         state.currentQuestionIndex--;
         renderQuestion();
     }
 }
 
 function handleNextQuestion() {
-    if (state.quizData.every(q => q.userAnswer)) {
+    saveCurrentHighlights();
+    if (state.quizData.every(q => q.userAnswer) && state.currentQuestionIndex === state.quizData.length - 1) {
         showResults();
         return;
     }
@@ -422,6 +477,8 @@ function handleNextQuestion() {
         if (firstUnanswered !== -1) {
             state.currentQuestionIndex = firstUnanswered;
             renderQuestion();
+        } else {
+            showResults();
         }
     }
 }
@@ -457,3 +514,31 @@ function showResults() {
 function restartQuiz() {
     initQuiz(state.originalData);
 }
+
+// Highlight Event Listeners
+views.quiz.addEventListener('mouseup', () => {
+    if (!state.highlightMode) return;
+    const selection = window.getSelection();
+    if (!selection.isCollapsed) {
+        const range = selection.getRangeAt(0);
+        try {
+            const mark = document.createElement('mark');
+            mark.className = 'quiz-highlight';
+            range.surroundContents(mark);
+            selection.removeAllRanges();
+        } catch(err) {
+            console.log("Cannot highlight across multiple elements.");
+        }
+    }
+});
+
+views.quiz.addEventListener('click', (e) => {
+    if (state.highlightMode && e.target.tagName.toLowerCase() === 'mark' && e.target.classList.contains('quiz-highlight')) {
+        const parent = e.target.parentNode;
+        while (e.target.firstChild) {
+            parent.insertBefore(e.target.firstChild, e.target);
+        }
+        parent.removeChild(e.target);
+        parent.normalize();
+    }
+});
