@@ -333,7 +333,8 @@ body.dark-mode .quiz-highlight {
 
 .option-btn {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
+    flex-wrap: wrap;
     padding: 1rem 1.25rem;
     background-color: var(--option-bg);
     border: 2px solid var(--option-border);
@@ -344,6 +345,17 @@ body.dark-mode .quiz-highlight {
     font-size: 1rem;
     font-family: inherit;
     color: var(--text-main);
+}
+
+.option-reason-text {
+    flex-basis: 100%;
+    margin-top: 0.75rem;
+    margin-left: calc(28px + 1rem); /* aligns with option text */
+    font-size: 0.9em;
+    color: var(--text-muted);
+    line-height: 1.4;
+    padding-top: 0.75rem;
+    border-top: 1px dashed var(--border-color);
 }
 
 .option-btn:hover:not(:disabled) {

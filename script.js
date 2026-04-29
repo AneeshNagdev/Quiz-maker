@@ -152,87 +152,172 @@ function handleGenerateText() {
 function parseRawTextToJSON(rawText) {
     const lines = rawText.split('\n').map(l => l.trim()).filter(l => l);
     const data = [];
-    
     let currentBlock = null;
-    
-    // Highly versatile edge-case regex matching
+
+    // Improved Regexes
     const questionHeaderRegex = /^(?:Question|Q|Ques)?\s*\d+[\.\:\-\)]?\s*/i;
-    const optionRegex = /^[a-h][\.\)]\s+/i;
-    const answerRegex = /^(?:Correct )?(?:Answer|Ans|Option)[\:\-]?\s*([a-h])/i;
+    const optionRegex = /^(?:\()?([a-h1-8])[\.\)](?:\s+|$)/i;
+    const answerRegex = /^(?:Correct\s+)?(?:Answer|Ans|Option|Correct)[\:\-]?\s*(?:\()?([a-h1-8])(?:\))?/i;
 
     for (let i = 0; i < lines.length; i++) {
         let line = lines[i];
-        let isNewQuestionHeader = false;
-        
+        let isNewQuestion = false;
+
         if (questionHeaderRegex.test(line)) {
-            if (!currentBlock || currentBlock.answer) {
-                isNewQuestionHeader = true;
+            if (!currentBlock || currentBlock.options.length >= 2) {
+                isNewQuestion = true;
             }
-        } else if (!currentBlock || currentBlock.answer) {
-            isNewQuestionHeader = true;
+        } else if (currentBlock && currentBlock.options.length >= 2) {
+            if (!optionRegex.test(line) && !answerRegex.test(line) && line.endsWith('?')) {
+                isNewQuestion = true;
+            }
+        } else if (!currentBlock) {
+            isNewQuestion = true;
         }
 
-        if (isNewQuestionHeader) {
-            if (currentBlock && currentBlock.question.length > 0 && currentBlock.options.length > 0 && currentBlock.answer) {
+        if (isNewQuestion) {
+            if (currentBlock && currentBlock.question.length > 0 && currentBlock.options.length > 0) {
+                finalizeBlock(currentBlock);
                 data.push(currentBlock);
             }
-            
             let qText = line.replace(questionHeaderRegex, '').trim();
-            
             currentBlock = {
                 question: qText ? [qText] : [],
                 options: [],
                 answer: null,
+                explanations: {},
+                unassignedLines: [],
                 parsingMode: "question"
             };
             continue;
         }
-        
-        if (answerRegex.test(line)) {
+
+        if (answerRegex.test(line) && currentBlock.options.length > 0) {
             const match = line.match(answerRegex);
             if (match && match[1]) {
-                currentBlock.answer = match[1].toUpperCase();
+                currentBlock.answer = normalizeLetter(match[1]);
             }
             currentBlock.parsingMode = "answer";
         } else if (optionRegex.test(line)) {
             currentBlock.parsingMode = "options";
-            const letter = line.charAt(0).toUpperCase();
-            // Handle variants like "A. " or "A) "
-            const text = line.replace(/^[a-h][\.\)]\s*/i, '').trim();
+            const match = line.match(optionRegex);
+            const rawId = match[1];
+            const letter = normalizeLetter(rawId);
+            
+            let text = line.replace(optionRegex, '').trim();
+            let explanation = "";
+
+            const reasonMatch = text.match(/(.*?)(?:\s*[-–—]\s*)?(?:Reason|Explanation)\s*:?\s*(.*)/i);
+            
+            if (reasonMatch) {
+                text = reasonMatch[1].trim();
+                text = text.replace(/\s*[-–—]\s*$/, '').trim();
+                explanation = reasonMatch[2].trim();
+            } else if (/\s+[-–—]\s+/.test(text)) {
+                let parts = text.split(/\s+[-–—]\s+/);
+                let potentialExplanation = parts.pop().trim();
+                let isExplanation = /\b(correct|incorrect|wrong|right|because|is the)\b/i.test(potentialExplanation) || potentialExplanation.length > 20;
+                
+                if (isExplanation) {
+                    explanation = potentialExplanation;
+                    text = parts.join(' - ').trim();
+                } else {
+                    text = parts.join(' - ') + ' - ' + potentialExplanation;
+                }
+            }
+            
             currentBlock.options.push([letter, text]);
+            if (explanation) {
+                currentBlock.explanations[letter] = explanation;
+            }
         } else {
-            // Continuation line
             if (currentBlock.parsingMode === "question") {
                 currentBlock.question.push(line);
-            } else if (currentBlock.parsingMode === "options" && currentBlock.options.length > 0) {
-                currentBlock.options[currentBlock.options.length - 1][1] += " " + line;
+            } else if (currentBlock.parsingMode === "options" || currentBlock.parsingMode === "answer" || currentBlock.parsingMode === "explanations") {
+                const explPrefixRegex = /^(?:Explanation|Reason)?\s*(?:\()?([a-h1-8])[\.\)]?\s*[:\-]?\s*(.*)/i;
+                const match = line.match(explPrefixRegex);
+                
+                if (match && match[1] && currentBlock.options.some(o => o[0] === normalizeLetter(match[1]))) {
+                    const letter = normalizeLetter(match[1]);
+                    const content = match[2] ? match[2].trim() : "";
+                    if (!currentBlock.explanations[letter]) currentBlock.explanations[letter] = "";
+                    currentBlock.explanations[letter] += (currentBlock.explanations[letter] ? " " : "") + content;
+                    currentBlock.parsingMode = "explanations";
+                    currentBlock.lastExplLetter = letter;
+                } else if (currentBlock.parsingMode === "explanations" && currentBlock.lastExplLetter) {
+                    currentBlock.explanations[currentBlock.lastExplLetter] += " " + line;
+                } else {
+                    currentBlock.unassignedLines.push(line);
+                }
             }
         }
     }
     
-    // Flush final block
-    if (currentBlock && currentBlock.question.length > 0 && currentBlock.options.length > 0 && currentBlock.answer) {
+    if (currentBlock && currentBlock.question.length > 0 && currentBlock.options.length > 0) {
+        finalizeBlock(currentBlock);
         data.push(currentBlock);
     }
+
+    function finalizeBlock(block) {
+        if (block.unassignedLines && block.unassignedLines.length > 0) {
+            const optsWithoutExpl = block.options.filter(opt => !block.explanations[opt[0]]);
+            
+            if (block.unassignedLines.length === optsWithoutExpl.length && optsWithoutExpl.length > 0) {
+                optsWithoutExpl.forEach((opt, idx) => {
+                    block.explanations[opt[0]] = block.unassignedLines[idx];
+                });
+            } else if (block.unassignedLines.length === block.options.length) {
+                block.options.forEach((opt, idx) => {
+                    block.explanations[opt[0]] = block.unassignedLines[idx];
+                });
+            } else if (block.options.length > 0) {
+                block.options[block.options.length - 1][1] += " " + block.unassignedLines.join(" ");
+            }
+        }
+    }
     
+    function normalizeLetter(id) {
+        id = id.toUpperCase();
+        const map = { '1': 'A', '2': 'B', '3': 'C', '4': 'D', '5': 'E', '6': 'F', '7': 'G', '8': 'H' };
+        return map[id] || id;
+    }
+
     const finalData = data.map((block, index) => {
         const qTexts = block.question.join(' ');
         
-        const explanations = {};
+        if (!block.answer) {
+            for (let i = 0; i < block.options.length; i++) {
+                let letter = block.options[i][0];
+                let expl = block.explanations[letter] || "";
+                if (expl && /\b(?:is correct|correct answer|is the correct|correct)\b/i.test(expl) && !/\b(?:incorrect|wrong)\b/i.test(expl)) {
+                    block.answer = letter;
+                    break;
+                }
+            }
+            if (!block.answer && block.options.length > 0) {
+                block.answer = block.options[0][0]; // fallback
+            }
+        }
+        
+        const finalExplanations = {};
         block.options.forEach(opt => {
-            explanations[opt[0]] = opt[0] === block.answer ? "Correct answer." : "Incorrect.";
+            if (block.explanations[opt[0]]) {
+                finalExplanations[opt[0]] = block.explanations[opt[0]];
+            } else {
+                finalExplanations[opt[0]] = opt[0] === block.answer ? "Correct answer." : "Incorrect.";
+            }
         });
         
         return {
             question: qTexts || "Question " + (index + 1),
             options: block.options,
             answer: block.answer,
-            explanations: explanations
+            explanations: finalExplanations
         };
     });
 
     if (finalData.length === 0) {
-        throw new Error("Could not parse. Please ensure inputs contain clear Questions, Options (A), B), etc), and 'Answer: X'.");
+        throw new Error("Could not parse. Please ensure inputs contain clear Questions, Options (A), B), etc).");
     }
     
     return finalData;
@@ -370,6 +455,14 @@ function renderQuestion() {
             } else {
                 btn.classList.add('disabled-unselected');
             }
+            
+            const explanation = qData.explanations[optionId];
+            if (explanation) {
+                const reasonDiv = document.createElement('div');
+                reasonDiv.className = 'option-reason-text';
+                reasonDiv.innerHTML = `<strong>Reason:</strong> ${explanation}`;
+                btn.appendChild(reasonDiv);
+            }
         }
         
         btn.addEventListener('click', () => handleOptionClick(optionId, btn));
@@ -377,13 +470,10 @@ function renderQuestion() {
     });
     
     if (qData.userAnswer) {
-        const isCorrect = qData.userAnswer === qData.answer;
-        elements.explanationText.innerHTML = qData.explanationHtml || qData.explanations[qData.userAnswer];
-        elements.explanationContainer.style.borderLeftColor = isCorrect ? 'var(--correct-border)' : 'var(--incorrect-border)';
-        const icon = elements.explanationContainer.querySelector('.info-icon');
-        icon.style.color = isCorrect ? 'var(--correct-text)' : 'var(--incorrect-text)';
-        elements.explanationHeader.style.color = isCorrect ? 'var(--correct-text)' : 'var(--incorrect-text)';
-        elements.explanationContainer.classList.remove('hidden');
+        // Appended inline reasons are already handled when options are created
+        // if we are in review mode or already answered.
+        // We will just hide the main explanation container to prevent duplication
+        elements.explanationContainer.classList.add('hidden');
     } else {
         elements.explanationContainer.classList.add('hidden');
     }
@@ -436,14 +526,19 @@ function handleOptionClick(selectedId, selectedBtn) {
         if (!btn.classList.contains('correct') && !btn.classList.contains('incorrect')) {
             btn.classList.add('disabled-unselected');
         }
+        
+        const optId = btn.dataset.id;
+        const explanation = qData.explanations[optId];
+        if (explanation) {
+            const reasonDiv = document.createElement('div');
+            reasonDiv.className = 'option-reason-text';
+            reasonDiv.innerHTML = `<strong>Reason:</strong> ${explanation}`;
+            btn.appendChild(reasonDiv);
+        }
     });
 
-    elements.explanationText.textContent = qData.explanations[selectedId];
-    elements.explanationContainer.style.borderLeftColor = isCorrect ? 'var(--correct-border)' : 'var(--incorrect-border)';
-    const icon = elements.explanationContainer.querySelector('.info-icon');
-    icon.style.color = isCorrect ? 'var(--correct-text)' : 'var(--incorrect-text)';
-    elements.explanationHeader.style.color = isCorrect ? 'var(--correct-text)' : 'var(--incorrect-text)';
-    elements.explanationContainer.classList.remove('hidden');
+    // Hide global explanation since we show inline reasons now
+    elements.explanationContainer.classList.add('hidden');
     
     if (state.quizData.every(q => q.userAnswer)) {
         if (state.currentQuestionIndex === state.quizData.length - 1) {
