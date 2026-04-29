@@ -568,13 +568,21 @@ body.dark-mode .quiz-highlight {
     height: 150px;
     border-radius: 50%;
     background: conic-gradient(var(--primary) 0%, var(--primary) 0%, #e5e7eb 0%, #e5e7eb 100%);
-    font-size: 2.5rem;
-    font-weight: 700;
-    color: var(--primary);
-    border: 8px solid white;
     box-shadow: var(--shadow-lg);
     position: relative;
-    background-color: #f8fafc;
+}
+
+.score-circle-inner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background-color: var(--card-bg);
+    font-size: 2.5rem;
+    font-weight: 700;
+    z-index: 10;
 }
 
 .score-divider {

@@ -120,11 +120,13 @@
             <div class="results-card">
                 <h2>Quiz Completed!</h2>
                 <div class="final-score">
-                    <span class="score-circle">
-                        <span id="final-score-val"></span>
-                        <span class="score-divider">/</span>
-                        <span id="final-score-total"></span>
-                    </span>
+                    <div class="score-circle">
+                        <div class="score-circle-inner">
+                            <span id="final-score-val"></span>
+                            <span class="score-divider">/</span>
+                            <span id="final-score-total"></span>
+                        </div>
+                    </div>
                 </div>
                 <p id="results-message"></p>
                 <button id="restart-btn" class="btn primary-btn mt-4">Restart Quiz</button>
@@ -133,6 +135,11 @@
             </div>
         </div>
     </div>
-    <script src="script.js"></script>
+    <script src="js/state.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/parser.js"></script>
+    <script src="js/quiz.js"></script>
+    <script src="js/highlighter.js"></script>
+    <script src="js/main.js"></script>
 </body>
 </html>
