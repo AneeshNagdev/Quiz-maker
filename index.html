@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,139 +8,466 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
-    <div class="app-container">
-        <!-- Header -->
-        <header class="app-header">
-            <h1>Interactive Quiz</h1>
-            <div class="header-controls">
-                <div id="score-container" class="hidden">
-                    <span class="score-badge">Score: <span id="current-score">0</span> / <span id="total-questions">0</span></span>
-                </div>
-                <button id="highlight-toggle" class="icon-btn" aria-label="Toggle Highlighter" title="Toggle Highlighter">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M12 20h9"></path>
-                        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
-                    </svg>
-                </button>
-                <button id="theme-toggle" class="icon-btn" aria-label="Toggle Dark Mode">
-                    <svg id="moon-icon" class="hidden" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
-                    <svg id="sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
-                </button>
-            </div>
-        </header>
+    <!-- Landing View -->
+    <div id="landing-view" class="landing-view active-view">
+        <div class="landing-left">
+            <div class="landing-quote-container">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round" class="quote-icon">
+                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+                </svg>
+                <h2>Quiz Me</h2>
+                <blockquote class="landing-quote" id="landing-quote-text">
+                    "The beautiful thing about learning is that no one can take it away from you."
+                </blockquote>
+                <p class="landing-author" id="landing-quote-author">- B.B. King</p>
 
-        <!-- Upload View -->
-        <div id="upload-view" class="view active-view">
-            <div class="upload-container">
-                <!-- File Upload Card -->
-                <div class="upload-card">
-                    <div class="upload-icon">
-                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                            <polyline points="17 8 12 3 7 8"></polyline>
-                            <line x1="12" y1="3" x2="12" y2="15"></line>
-                        </svg>
-                    </div>
-                    <h2>Upload JSON File</h2>
-                    <p>Select a formatted .json file.</p>
-                    <div class="file-input-wrapper">
-                        <button class="btn primary-btn">Choose File</button>
-                        <input type="file" id="json-upload" accept=".json" />
-                    </div>
-                </div>
-
-                <div class="upload-divider">OR</div>
-
-                <!-- Text Paste Card -->
-                <div class="upload-card">
-                    <div class="upload-icon">
-                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                            <polyline points="14 2 14 8 20 8"></polyline>
-                            <line x1="16" y1="13" x2="8" y2="13"></line>
-                            <line x1="16" y1="17" x2="8" y2="17"></line>
-                            <polyline points="10 9 9 9 8 9"></polyline>
-                        </svg>
-                    </div>
-                    <h2>Paste Raw Text</h2>
-                    <p>Paste questions directly in the standard text format.</p>
-                    <textarea id="raw-text-input" class="text-input" placeholder="Question 1.&#10;&#10;What is...&#10;A. Option&#10;B. Option&#10;Answer: B"></textarea>
-                    <button id="generate-text-btn" class="btn primary-btn mt-2">Generate Quiz</button>
+                <div class="landing-cards-decor">
+                    <div class="decor-card card-1">Biology 101</div>
+                    <div class="decor-card card-2">US History</div>
+                    <div class="decor-card card-3">Calculus</div>
                 </div>
             </div>
-            <div id="upload-error" class="error-msg hidden"></div>
         </div>
+        <div class="landing-right">
+            <div class="auth-box">
+                <h2 id="auth-title">Create an account</h2>
+                <p id="auth-subtitle">Enter your details below to get started</p>
 
-        <!-- Quiz View -->
-        <div id="quiz-view" class="view">
-            <div class="quiz-layout">
-                <div class="quiz-main">
-                    <div class="quiz-card">
-                        <div class="card-header">
-                            <span class="question-number">Question <span id="q-num">1</span> of <span id="q-total"></span></span>
-                        </div>
-                        <h2 id="question-text" class="question-text"></h2>
-                        
-                        <div id="options-container" class="options-container">
-                            <!-- Options injected here -->
-                        </div>
-
-                        <div id="explanation-container" class="explanation-container hidden">
-                            <div class="explanation-header">
-                                <svg class="info-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <circle cx="12" cy="12" r="10"></circle>
-                                    <line x1="12" y1="16" x2="12" y2="12"></line>
-                                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                <!-- Sign Up Form -->
+                <form id="signup-form" class="auth-form">
+                    <span id="signup-error-msg" class="auth-error-msg hidden"></span>
+                    <div class="form-group">
+                        <label for="signup-name">Name</label>
+                        <input type="text" id="signup-name" placeholder="John Doe" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="signup-email">Email</label>
+                        <input type="email" id="signup-email" placeholder="name@example.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="signup-password">Password</label>
+                        <div class="password-container">
+                            <input type="password" id="signup-password" required minlength="8"
+                                placeholder="At least 8 characters">
+                            <span class="password-toggle-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                    <circle cx="12" cy="12" r="3"></circle>
                                 </svg>
-                                <h3>Explanation</h3>
-                            </div>
-                            <p id="explanation-text"></p>
+                            </span>
                         </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="signup-confirm">Confirm Password</label>
+                        <div class="password-container">
+                            <input type="password" id="signup-confirm" required minlength="8">
+                            <span class="password-toggle-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                </svg>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="form-group checkbox-group">
+                        <input type="checkbox" id="signup-terms" required>
+                        <label for="signup-terms">I agree to the <a href="terms.html" target="_blank">Terms of Service</a> and <a
+                                href="privacy.html" target="_blank">Privacy Policy</a></label>
+                    </div>
+                    <button type="submit" class="btn primary-btn w-full mt-4" id="signup-submit">Create Account</button>
+                </form>
 
-                        <div class="card-footer" id="card-footer">
-                            <button id="prev-btn" class="btn secondary-btn hidden">Previous</button>
-                            <button id="next-btn" class="btn primary-btn hidden">Next</button>
+                <!-- Sign In Form (Hidden initially) -->
+                <form id="signin-form" class="auth-form hidden">
+                    <span id="signin-error-msg" class="auth-error-msg hidden"></span>
+                    <div class="form-group">
+                        <label for="signin-email">Email</label>
+                        <input type="email" id="signin-email" placeholder="name@example.com" required>
+                    </div>
+                    <div class="form-group">
+                        <div style="display:flex; justify-content:space-between;">
+                            <label for="signin-password">Password</label>
+                            <a href="#" id="forgot-password-link"
+                                style="font-size: 0.85rem; color: var(--primary); text-decoration: none;">Forgot
+                                password?</a>
+                        </div>
+                        <div class="password-container">
+                            <input type="password" id="signin-password" required minlength="8">
+                            <span class="password-toggle-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                </svg>
+                            </span>
                         </div>
                     </div>
-                </div>
-                
-                <div class="quiz-sidebar-container">
-                    <div class="quiz-sidebar-card">
-                        <h3 class="sidebar-title">Question Grid</h3>
-                        <div id="question-grid" class="question-grid">
-                            <!-- Navigation buttons injected here -->
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+                    <button type="submit" class="btn primary-btn w-full mt-4" id="signin-submit">Sign In</button>
+                </form>
 
-        <!-- Results View -->
-        <div id="results-view" class="view">
-            <div class="results-card">
-                <h2>Quiz Completed!</h2>
-                <div class="final-score">
-                    <div class="score-circle">
-                        <div class="score-circle-inner">
-                            <span id="final-score-val"></span>
-                            <span class="score-divider">/</span>
-                            <span id="final-score-total"></span>
-                        </div>
-                    </div>
+                <div class="auth-divider">
+                    <span>OR</span>
                 </div>
-                <p id="results-message"></p>
-                <button id="restart-btn" class="btn primary-btn mt-4">Restart Quiz</button>
-                <button id="review-btn" class="btn secondary-btn mt-2">Review Answers</button>
-                <button id="upload-another-btn" class="btn secondary-btn mt-2">Upload New File</button>
+
+                <button id="google-login-btn" class="btn secondary-btn w-full">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" class="mr-2">
+                        <path
+                            d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                            fill="#4285F4" />
+                        <path
+                            d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                            fill="#34A853" />
+                        <path
+                            d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                            fill="#FBBC05" />
+                        <path
+                            d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                            fill="#EA4335" />
+                    </svg>
+                    Continue with Google
+                </button>
+
+                <div class="auth-toggle-text">
+                    <span id="auth-toggle-question">Already have an account?</span>
+                    <a href="#" id="auth-toggle-link">Sign in</a>
+                </div>
+
+                <div class="guest-bypass">
+                    <a href="#" id="guest-btn">Continue without an account</a>
+                </div>
             </div>
         </div>
     </div>
+
+    <div class="app-layout hidden" id="main-app">
+        <div id="guest-auth-buttons" class="hidden" style="position: absolute; top: 11px; right: 20px; z-index: 100; display: flex; gap: 10px;">
+            <button id="top-signin-btn" class="btn secondary-btn" style="height: 55px; width: 100px;">Sign In</button>
+            <button id="top-signup-btn" class="btn primary-btn" style="height: 55px; width: 100px;">Sign Up</button>
+        </div>
+        <!-- Sidebar -->
+        <aside class="app-sidebar" id="app-sidebar">
+            <div class="sidebar-top">
+                <button id="new-quiz-btn" class="btn primary-btn sidebar-btn">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                    New Quiz
+                </button>
+                <div class="search-box" id="sidebar-search-box">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        class="search-icon">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    <input type="text" id="search-quiz-input" placeholder="Search quiz...">
+                </div>
+            </div>
+
+            <div class="sidebar-middle">
+                <h4 class="sidebar-section-title">Recent</h4>
+                <div id="saved-quizzes-list" class="saved-quizzes-list">
+                    <!-- Quizzes injected here -->
+                </div>
+            </div>
+
+            <div class="sidebar-bottom">
+                <div id="user-info" class="user-info hidden">
+                    <div class="user-details">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" class="user-icon">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                        <span id="user-name" class="user-name"></span>
+                    </div>
+                </div>
+                <div class="theme-selector-wrapper sidebar-theme">
+                    <select id="theme-selector" class="theme-select w-full">
+                        <option value="light">Warm Light</option>
+                        <option value="dark">Classic Dark</option>
+                        <option value="forest">Focus Forest</option>
+                        <option value="midnight">Deep Midnight</option>
+                    </select>
+                </div>
+                <button id="logout-btn" class="btn secondary-btn small-btn w-full mt-2 hidden">Logout</button>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="app-main-content">
+            <!-- Header -->
+            <header class="app-header">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <button id="mobile-sidebar-toggle" class="icon-btn mobile-only">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <line x1="3" y1="12" x2="21" y2="12"></line>
+                            <line x1="3" y1="6" x2="21" y2="6"></line>
+                            <line x1="3" y1="18" x2="21" y2="18"></line>
+                        </svg>
+                    </button>
+                    <h1>Interactive Quiz</h1>
+                </div>
+                <div class="header-controls">
+                    <div id="score-container" class="hidden">
+                        <span class="score-badge">Score: <span id="current-score">0</span> / <span
+                                id="total-questions">0</span></span>
+                    </div>
+                    <button id="highlight-toggle" class="icon-btn" aria-label="Toggle Highlighter"
+                        title="Toggle Highlighter">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 20h9"></path>
+                            <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                        </svg>
+                    </button>
+                </div>
+            </header>
+
+            <div class="main-scrollable">
+                <!-- Upload View -->
+                <div id="upload-view" class="view">
+                    <div class="upload-container">
+                        <!-- File Upload Card -->
+                        <div class="upload-card">
+                            <div class="upload-icon">
+                                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="17 8 12 3 7 8"></polyline>
+                                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                                </svg>
+                            </div>
+                            <h2>Upload JSON File</h2>
+                            <p>Select a formatted .json file.</p>
+                            <div class="file-input-wrapper">
+                                <button class="btn primary-btn">Choose File</button>
+                                <input type="file" id="json-upload" accept=".json" />
+                            </div>
+                        </div>
+
+                        <div class="upload-divider">OR</div>
+
+                        <!-- Text Paste Card -->
+                        <div class="upload-card">
+                            <div class="upload-icon">
+                                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                    <polyline points="14 2 14 8 20 8"></polyline>
+                                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                                    <polyline points="10 9 9 9 8 9"></polyline>
+                                </svg>
+                            </div>
+                            <h2>Paste Raw Text</h2>
+                            <p>Paste questions directly in the standard text format.</p>
+                            <textarea id="raw-text-input" class="text-input"
+                                placeholder="Question 1.&#10;&#10;What is...&#10;A. Option&#10;B. Option&#10;Answer: B"></textarea>
+                            <button id="generate-text-btn" class="btn primary-btn mt-2">Generate Quiz</button>
+                        </div>
+                    </div>
+                    <div id="upload-error" class="error-msg hidden"></div>
+                </div>
+
+                <!-- Quiz View -->
+                <div id="quiz-view" class="view">
+                    <div class="quiz-layout">
+                        <div class="quiz-main">
+                            <div class="quiz-card">
+                                <div class="card-header">
+                                    <span class="question-number">Question <span id="q-num">1</span> of <span
+                                            id="q-total"></span></span>
+                                </div>
+                                <h2 id="question-text" class="question-text"></h2>
+
+                                <div id="options-container" class="options-container">
+                                    <!-- Options injected here -->
+                                </div>
+
+                                <div id="explanation-container" class="explanation-container hidden">
+                                    <div class="explanation-header">
+                                        <svg class="info-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                            stroke-linejoin="round">
+                                            <circle cx="12" cy="12" r="10"></circle>
+                                            <line x1="12" y1="16" x2="12" y2="12"></line>
+                                            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                                        </svg>
+                                        <h3>Explanation</h3>
+                                    </div>
+                                    <p id="explanation-text"></p>
+                                </div>
+
+                                <div class="card-footer" id="card-footer">
+                                    <button id="prev-btn" class="btn secondary-btn hidden">Previous</button>
+                                    <button id="next-btn" class="btn primary-btn hidden">Next</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="quiz-sidebar-container">
+                            <div class="quiz-sidebar-card">
+                                <h3 class="sidebar-title">Question Grid</h3>
+                                <div id="question-grid" class="question-grid">
+                                    <!-- Navigation buttons injected here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Results View -->
+                <div id="results-view" class="view">
+                    <div class="results-card">
+                        <h2>Quiz Completed!</h2>
+                        <div class="final-score">
+                            <div class="score-circle">
+                                <div class="score-circle-inner">
+                                    <span id="final-score-val"></span>
+                                    <span class="score-divider">/</span>
+                                    <span id="final-score-total"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <p id="results-message"></p>
+                        <button id="save-cloud-btn" class="btn primary-btn mt-4">Save Progress to Cloud</button>
+                        <button id="restart-btn" class="btn secondary-btn mt-2">Restart Quiz</button>
+                        <button id="review-btn" class="btn secondary-btn mt-2">Review Answers</button>
+                        <button id="upload-another-btn" class="btn secondary-btn mt-2">Upload New File</button>
+                    </div>
+                </div>
+            </div>
+    </div>
+    </main>
+    </div>
+
+
+    <!-- Modals -->
+    <!-- Forgot Password Modal -->
+    <div id="forgot-password-modal" class="modal-overlay hidden">
+        <div class="modal-content auth-box">
+            <h2 id="auth-title">Reset Password</h2>
+            <p id="auth-subtitle">Enter your email and we'll send you a link to reset your password.</p>
+            <span id="reset-error-msg" class="auth-error-msg hidden"></span>
+            <form id="forgot-password-form" class="auth-form">
+                <div class="form-group">
+                    <label for="reset-email">Email Address</label>
+                    <input type="email" id="reset-email" placeholder="name@example.com" required>
+                </div>
+                <button type="submit" class="btn primary-btn w-full mt-4" id="reset-submit">Send Reset Link</button>
+                <button type="button" class="btn secondary-btn w-full mt-2" id="cancel-reset-btn">Cancel</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Set Password Modal (For Google Users) -->
+    <div id="set-password-modal" class="modal-overlay hidden">
+        <div class="modal-content auth-box">
+            <h2 id="auth-title">Secure Your Account</h2>
+            <p id="auth-subtitle">You signed in with Google. Set a password now so you can log in directly with your
+                email next time.</p>
+            <form id="set-password-form" class="auth-form">
+                <div class="form-group">
+                    <label for="new-password">New Password</label>
+                    <div class="password-container">
+                        <input type="password" id="new-password" required minlength="8"
+                            placeholder="At least 8 characters">
+                        <span class="password-toggle-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                        </span>
+                    </div>
+                </div>
+                <button type="submit" class="btn primary-btn w-full mt-4" id="set-password-submit">Set Password</button>
+                <button type="button" class="btn secondary-btn w-full mt-2" id="skip-password-btn">Skip for now</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Save Prompt Modal -->
+    <div id="save-prompt-modal" class="modal-overlay hidden">
+        <div class="modal-content auth-box">
+            <h2 id="save-prompt-title">Save Quiz</h2>
+            <p id="save-prompt-subtitle">Enter a name for your quiz.</p>
+            <div class="form-group mt-4">
+                <input type="text" id="save-quiz-name-input" class="w-full" placeholder="Quiz Name">
+            </div>
+            <button type="button" class="btn primary-btn w-full mt-4" id="confirm-save-btn">Save</button>
+            <button type="button" class="btn secondary-btn w-full mt-2" id="cancel-save-btn">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Guest Auth Modal -->
+    <div id="auth-required-modal" class="modal-overlay hidden">
+        <div class="modal-content auth-box text-center">
+            <h2>Authentication Required</h2>
+            <p class="mt-2 text-muted">You must be signed in to save progress to the cloud. Your current quiz progress
+                will be preserved when you sign in.</p>
+
+            <button id="guest-google-btn" class="btn secondary-btn w-full mt-4">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" class="mr-2">
+                    <path
+                        d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                        fill="#4285F4" />
+                    <path
+                        d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                        fill="#34A853" />
+                    <path
+                        d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                        fill="#FBBC05" />
+                    <path
+                        d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                        fill="#EA4335" />
+                </svg>
+                Continue with Google
+            </button>
+
+            <button id="guest-signin-btn" class="btn primary-btn w-full mt-2">Sign In</button>
+            <button id="guest-signup-btn" class="btn secondary-btn w-full mt-2">Sign Up</button>
+            <button id="guest-cancel-btn" class="btn text-muted w-full mt-4"
+                style="background:transparent; box-shadow:none;">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Discard Prompt Modal -->
+    <div id="discard-prompt-modal" class="modal-overlay hidden">
+        <div class="modal-content auth-box text-center">
+            <h2>Unsaved Progress</h2>
+            <p class="mt-2 text-muted">You have unsaved progress. Are you sure you want to discard it?</p>
+            <button id="confirm-discard-btn" class="btn primary-btn w-full mt-4"
+                style="background-color: var(--incorrect-border);">Discard Progress</button>
+            <button id="cancel-discard-btn" class="btn secondary-btn w-full mt-2">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Firebase SDK (Compat version to avoid module/CORS issues on local files) -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
+
     <script src="js/state.js"></script>
+    <script src="js/firebase-config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/database.js"></script>
     <script src="js/ui.js"></script>
     <script src="js/parser.js"></script>
     <script src="js/quiz.js"></script>
     <script src="js/highlighter.js"></script>
     <script src="js/main.js"></script>
 </body>
+
 </html>
