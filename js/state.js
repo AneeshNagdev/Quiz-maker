@@ -33,7 +33,59 @@ const elements = {
     rawTextInput: document.getElementById('raw-text-input'),
     generateTextBtn: document.getElementById('generate-text-btn'),
     reviewBtn: document.getElementById('review-btn'),
-    highlightToggle: document.getElementById('highlight-toggle')
+    highlightToggle: document.getElementById('highlight-toggle'),
+    
+    // Firebase Elements
+    loginBtn: document.getElementById('login-btn'),
+    logoutBtn: document.getElementById('logout-btn'),
+    userInfo: document.getElementById('user-info'),
+    userName: document.getElementById('user-name'),
+    saveCloudBtn: document.getElementById('save-cloud-btn'),
+    savedQuizzesContainer: document.getElementById('saved-quizzes-container'),
+    savedQuizzesList: document.getElementById('saved-quizzes-list'),
+    
+    // Landing Page Elements
+    mainApp: document.getElementById('main-app'),
+    landingView: document.getElementById('landing-view'),
+    authTitle: document.getElementById('auth-title'),
+    authSubtitle: document.getElementById('auth-subtitle'),
+    signupForm: document.getElementById('signup-form'),
+    signinForm: document.getElementById('signin-form'),
+    authToggleLink: document.getElementById('auth-toggle-link'),
+    authToggleQuestion: document.getElementById('auth-toggle-question'),
+    guestBtn: document.getElementById('guest-btn'),
+    googleLoginBtn: document.getElementById('google-login-btn'),
+    themeSelector: document.getElementById('theme-selector'),
+
+    // Password Management Elements
+    forgotPasswordLink: document.getElementById('forgot-password-link'),
+    forgotPasswordModal: document.getElementById('forgot-password-modal'),
+    forgotPasswordForm: document.getElementById('forgot-password-form'),
+    cancelResetBtn: document.getElementById('cancel-reset-btn'),
+    
+    setPasswordModal: document.getElementById('set-password-modal'),
+    setPasswordForm: document.getElementById('set-password-form'),
+    skipPasswordBtn: document.getElementById('skip-password-btn'),
+
+    // Sidebar Layout Elements
+    newQuizBtn: document.getElementById('new-quiz-btn'),
+    searchQuizInput: document.getElementById('search-quiz-input'),
+    appSidebar: document.getElementById('app-sidebar'),
+    mobileSidebarToggle: document.getElementById('mobile-sidebar-toggle'),
+
+    // New Modals & Elements
+    toastContainer: document.getElementById('toast-container'),
+    
+    savePromptModal: document.getElementById('save-prompt-modal'),
+    saveQuizNameInput: document.getElementById('save-quiz-name-input'),
+    confirmSaveBtn: document.getElementById('confirm-save-btn'),
+    cancelSaveBtn: document.getElementById('cancel-save-btn'),
+
+    authRequiredModal: document.getElementById('auth-required-modal'),
+    guestGoogleBtn: document.getElementById('guest-google-btn'),
+    guestSigninBtn: document.getElementById('guest-signin-btn'),
+    guestSignupBtn: document.getElementById('guest-signup-btn'),
+    guestCancelBtn: document.getElementById('guest-cancel-btn')
 };
 
 // Application State
@@ -43,5 +95,7 @@ let state = {
     score: 0,
     hasAnswered: false,
     highlightMode: false,
-    isReviewMode: false
+    isReviewMode: false,
+    hasSaved: false,
+    user: null // Firebase user
 };
