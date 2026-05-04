@@ -111,6 +111,7 @@
     </div>
 
     <div class="app-layout hidden" id="main-app">
+        <button id="top-login-btn" class="btn primary-btn hidden" style="position: absolute; top: 20px; right: 20px; z-index: 100;">Sign In / Sign Up</button>
         <!-- Sidebar -->
         <aside class="app-sidebar" id="app-sidebar">
             <div class="sidebar-top">
@@ -284,20 +285,7 @@
     </div>
     </main>
 </div>
-    <!-- Firebase SDK (Compat version to avoid module/CORS issues on local files) -->
-    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
 
-    <script src="js/state.js"></script>
-    <script src="js/firebase-config.js"></script>
-    <script src="js/auth.js"></script>
-    <script src="js/database.js"></script>
-    <script src="js/ui.js"></script>
-    <script src="js/parser.js"></script>
-    <script src="js/quiz.js"></script>
-    <script src="js/highlighter.js"></script>
-    <script src="js/main.js"></script>
 
     <!-- Modals -->
     <!-- Forgot Password Modal -->
@@ -368,7 +356,32 @@
         </div>
     </div>
 
+    <!-- Discard Prompt Modal -->
+    <div id="discard-prompt-modal" class="modal-overlay hidden">
+        <div class="modal-content auth-box text-center">
+            <h2>Unsaved Progress</h2>
+            <p class="mt-2 text-muted">You have unsaved progress. Are you sure you want to discard it?</p>
+            <button id="confirm-discard-btn" class="btn primary-btn w-full mt-4" style="background-color: var(--incorrect-border);">Discard Progress</button>
+            <button id="cancel-discard-btn" class="btn secondary-btn w-full mt-2">Cancel</button>
+        </div>
+    </div>
+
     <!-- Toast Container -->
     <div id="toast-container" class="toast-container"></div>
+
+    <!-- Firebase SDK (Compat version to avoid module/CORS issues on local files) -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
+
+    <script src="js/state.js"></script>
+    <script src="js/firebase-config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/database.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/parser.js"></script>
+    <script src="js/quiz.js"></script>
+    <script src="js/highlighter.js"></script>
+    <script src="js/main.js"></script>
 </body>
 </html>

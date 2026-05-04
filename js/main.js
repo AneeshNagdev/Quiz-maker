@@ -41,19 +41,30 @@ function handleGenerateText() {
 
 async function handleNewQuiz() {
     if (state.quizData && state.quizData.length > 0 && !state.hasSaved) {
-        // We are in the middle of a quiz, prompt to save
-        const saved = await saveQuizToCloud(true);
-        if (saved === null) {
-            // User cancelled the prompt, do not exit the quiz
+        if (!state.user) {
+            // Guest user: show discard prompt
+            if (elements.discardPromptModal) elements.discardPromptModal.classList.remove('hidden');
             return;
+        } else {
+            // Logged in user: prompt to save
+            const saved = await saveQuizToCloud(true);
+            if (saved === null || saved === false) {
+                // User cancelled or save failed, do not exit the quiz
+                return;
+            }
         }
     }
     
+    executeNewQuizReset();
+}
+
+function executeNewQuizReset() {
     // Reset state and return to upload view
     state.quizData = [];
     state.originalData = [];
     state.currentQuestionIndex = 0;
     state.score = 0;
+    state.hasSaved = false;
     
     if (elements.fileInput) elements.fileInput.value = '';
     if (elements.scoreContainer) elements.scoreContainer.classList.add('hidden');
@@ -177,6 +188,31 @@ document.addEventListener('DOMContentLoaded', () => {
     if(elements.guestCancelBtn) {
         elements.guestCancelBtn.addEventListener('click', () => {
             elements.authRequiredModal.classList.add('hidden');
+        });
+    }
+
+    // Top Login Button for Guests
+    if (elements.topLoginBtn) {
+        elements.topLoginBtn.addEventListener('click', () => {
+            elements.mainApp.classList.add('hidden');
+            elements.landingView.classList.remove('hidden');
+            if(elements.signinForm.classList.contains('hidden')) {
+                toggleAuthForm(new Event('click'));
+            }
+        });
+    }
+
+    // Discard Prompt Modal Listeners
+    if (elements.confirmDiscardBtn) {
+        elements.confirmDiscardBtn.addEventListener('click', () => {
+            elements.discardPromptModal.classList.add('hidden');
+            executeNewQuizReset();
+        });
+    }
+    
+    if (elements.cancelDiscardBtn) {
+        elements.cancelDiscardBtn.addEventListener('click', () => {
+            elements.discardPromptModal.classList.add('hidden');
         });
     }
 

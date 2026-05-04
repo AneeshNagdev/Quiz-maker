@@ -216,6 +216,7 @@ auth.onAuthStateChanged((user) => {
 
         if (elements.userInfo) elements.userInfo.classList.remove('hidden');
         if (elements.logoutBtn) elements.logoutBtn.classList.remove('hidden');
+        if (elements.topLoginBtn) elements.topLoginBtn.classList.add('hidden');
 
         // Sometimes display name takes a second to sync after registration
         setTimeout(() => {
@@ -230,6 +231,7 @@ auth.onAuthStateChanged((user) => {
         // User is logged out
         if (elements.userInfo) elements.userInfo.classList.add('hidden');
         if (elements.logoutBtn) elements.logoutBtn.classList.add('hidden');
+        if (elements.topLoginBtn) elements.topLoginBtn.classList.remove('hidden');
         
         if (elements.savedQuizzesList) elements.savedQuizzesList.innerHTML = '';
         

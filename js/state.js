@@ -85,7 +85,13 @@ const elements = {
     guestGoogleBtn: document.getElementById('guest-google-btn'),
     guestSigninBtn: document.getElementById('guest-signin-btn'),
     guestSignupBtn: document.getElementById('guest-signup-btn'),
-    guestCancelBtn: document.getElementById('guest-cancel-btn')
+    guestCancelBtn: document.getElementById('guest-cancel-btn'),
+
+    topLoginBtn: document.getElementById('top-login-btn'),
+    
+    discardPromptModal: document.getElementById('discard-prompt-modal'),
+    confirmDiscardBtn: document.getElementById('confirm-discard-btn'),
+    cancelDiscardBtn: document.getElementById('cancel-discard-btn')
 };
 
 // Application State
