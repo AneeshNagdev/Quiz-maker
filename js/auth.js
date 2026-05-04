@@ -236,6 +236,11 @@ auth.onAuthStateChanged((user) => {
         
         if (elements.savedQuizzesList) elements.savedQuizzesList.innerHTML = '';
         
+        // Unsubscribe from quizzes to prevent permission errors
+        if (typeof loadUserQuizzes === 'function') {
+            loadUserQuizzes();
+        }
+        
         // Return to landing view
         if (elements.mainApp) elements.mainApp.classList.add('hidden');
         if (elements.landingView) elements.landingView.classList.remove('hidden');
