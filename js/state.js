@@ -87,7 +87,9 @@ const elements = {
     guestSignupBtn: document.getElementById('guest-signup-btn'),
     guestCancelBtn: document.getElementById('guest-cancel-btn'),
 
-    topLoginBtn: document.getElementById('top-login-btn'),
+    guestAuthButtons: document.getElementById('guest-auth-buttons'),
+    topSigninBtn: document.getElementById('top-signin-btn'),
+    topSignupBtn: document.getElementById('top-signup-btn'),
     
     discardPromptModal: document.getElementById('discard-prompt-modal'),
     confirmDiscardBtn: document.getElementById('confirm-discard-btn'),

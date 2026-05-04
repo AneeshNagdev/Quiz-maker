@@ -97,46 +97,55 @@ async function saveQuizToCloud(isAutoSave = false) {
         return false;
     }
 }
+let quizzesUnsubscribe = null;
 
-async function loadUserQuizzes() {
-    if (!state.user) return;
-
-    try {
-        elements.savedQuizzesList.innerHTML = '<p class="text-sm text-muted">Loading...</p>';
-        
-        const snapshot = await db.collection('users').doc(state.user.uid).collection('quizzes')
-            .orderBy('timestamp', 'desc')
-            .get();
-
-        if (snapshot.empty) {
-            elements.savedQuizzesList.innerHTML = '<p class="text-sm text-muted">No saved quizzes found.</p>';
-            return;
+function loadUserQuizzes() {
+    if (!state.user) {
+        if (quizzesUnsubscribe) {
+            quizzesUnsubscribe();
+            quizzesUnsubscribe = null;
         }
-
-        elements.savedQuizzesList.innerHTML = '';
-        
-        snapshot.forEach(doc => {
-            const quiz = doc.data();
-            const btn = document.createElement('button');
-            btn.className = 'btn secondary-btn w-full mt-2 text-left';
-            
-            const dateStr = quiz.timestamp ? quiz.timestamp.toDate().toLocaleDateString() : 'Unknown date';
-            
-            btn.innerHTML = `
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <span>${quiz.name || 'Saved Quiz'}</span>
-                    <span style="font-size: 0.8rem; opacity: 0.7;">${dateStr}</span>
-                </div>
-            `;
-            
-            btn.onclick = () => loadQuizFromCloud(quiz.data);
-            elements.savedQuizzesList.appendChild(btn);
-        });
-
-    } catch (error) {
-        console.error("Error loading quizzes:", error);
-        elements.savedQuizzesList.innerHTML = '<p class="text-sm" style="color:var(--incorrect-border)">Error loading quizzes.</p>';
+        return;
     }
+
+    if (quizzesUnsubscribe) {
+        // Already listening
+        return;
+    }
+
+    elements.savedQuizzesList.innerHTML = '<p class="text-sm text-muted">Loading...</p>';
+    
+    quizzesUnsubscribe = db.collection('users').doc(state.user.uid).collection('quizzes')
+        .orderBy('timestamp', 'desc')
+        .onSnapshot((snapshot) => {
+            if (snapshot.empty) {
+                elements.savedQuizzesList.innerHTML = '<p class="text-sm text-muted">No saved quizzes found.</p>';
+                return;
+            }
+
+            elements.savedQuizzesList.innerHTML = '';
+            
+            snapshot.forEach(doc => {
+                const quiz = doc.data({ serverTimestamps: 'estimate' });
+                const btn = document.createElement('button');
+                btn.className = 'btn secondary-btn w-full mt-2 text-left';
+                
+                const dateStr = quiz.timestamp ? quiz.timestamp.toDate().toLocaleDateString() : 'Unknown date';
+                
+                btn.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span>${quiz.name || 'Saved Quiz'}</span>
+                        <span style="font-size: 0.8rem; opacity: 0.7;">${dateStr}</span>
+                    </div>
+                `;
+                
+                btn.onclick = () => loadQuizFromCloud(quiz.data);
+                elements.savedQuizzesList.appendChild(btn);
+            });
+        }, (error) => {
+            console.error("Error loading quizzes:", error);
+            elements.savedQuizzesList.innerHTML = '<p class="text-sm" style="color:var(--incorrect-border)">Error loading quizzes.</p>';
+        });
 }
 
 function loadQuizFromCloud(jsonString) {
@@ -150,6 +159,7 @@ function loadQuizFromCloud(jsonString) {
         state.currentQuestionIndex = 0;
         state.score = data.filter(q => q.isCorrect).length;
         state.isReviewMode = false;
+        state.hasSaved = true;
         
         // Rebuild grid
         elements.questionGrid.innerHTML = '';

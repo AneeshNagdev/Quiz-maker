@@ -145,9 +145,10 @@
     </div>
 
     <div class="app-layout hidden" id="main-app">
-        <button id="top-login-btn" class="btn primary-btn hidden"
-            style="position: absolute; top: 11px; right: 20px; z-index: 100; width: 136px; height: 55px;">Sign In / Sign
-            Up</button>
+        <div id="guest-auth-buttons" class="hidden" style="position: absolute; top: 11px; right: 20px; z-index: 100; display: flex; gap: 10px;">
+            <button id="top-signin-btn" class="btn secondary-btn" style="height: 55px; width: 100px;">Sign In</button>
+            <button id="top-signup-btn" class="btn primary-btn" style="height: 55px; width: 100px;">Sign Up</button>
+        </div>
         <!-- Sidebar -->
         <aside class="app-sidebar" id="app-sidebar">
             <div class="sidebar-top">

@@ -54,10 +54,11 @@ function handleGoogleLogin(e) {
     auth.signInWithPopup(provider)
         .then((result) => {
             const user = result.user;
-            // Check if user has a password provider
+            const isNewUser = result.additionalUserInfo?.isNewUser;
             const hasPassword = user.providerData.some(p => p.providerId === 'password');
-            if (!hasPassword) {
-                // First time google login, prompt to set password
+            
+            if (isNewUser && !hasPassword) {
+                // Only prompt to set password on first time google login
                 if (elements.setPasswordModal) elements.setPasswordModal.classList.remove('hidden');
             }
         })
@@ -216,7 +217,7 @@ auth.onAuthStateChanged((user) => {
 
         if (elements.userInfo) elements.userInfo.classList.remove('hidden');
         if (elements.logoutBtn) elements.logoutBtn.classList.remove('hidden');
-        if (elements.topLoginBtn) elements.topLoginBtn.classList.add('hidden');
+        if (elements.guestAuthButtons) elements.guestAuthButtons.classList.add('hidden');
 
         // Sometimes display name takes a second to sync after registration
         setTimeout(() => {
@@ -231,7 +232,7 @@ auth.onAuthStateChanged((user) => {
         // User is logged out
         if (elements.userInfo) elements.userInfo.classList.add('hidden');
         if (elements.logoutBtn) elements.logoutBtn.classList.add('hidden');
-        if (elements.topLoginBtn) elements.topLoginBtn.classList.remove('hidden');
+        if (elements.guestAuthButtons) elements.guestAuthButtons.classList.remove('hidden');
         
         if (elements.savedQuizzesList) elements.savedQuizzesList.innerHTML = '';
         

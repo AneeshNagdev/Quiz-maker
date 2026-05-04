@@ -191,12 +191,22 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Top Login Button for Guests
-    if (elements.topLoginBtn) {
-        elements.topLoginBtn.addEventListener('click', () => {
+    // Top Auth Buttons for Guests
+    if (elements.topSigninBtn) {
+        elements.topSigninBtn.addEventListener('click', () => {
             elements.mainApp.classList.add('hidden');
             elements.landingView.classList.remove('hidden');
             if(elements.signinForm.classList.contains('hidden')) {
+                toggleAuthForm(new Event('click'));
+            }
+        });
+    }
+
+    if (elements.topSignupBtn) {
+        elements.topSignupBtn.addEventListener('click', () => {
+            elements.mainApp.classList.add('hidden');
+            elements.landingView.classList.remove('hidden');
+            if(elements.signupForm.classList.contains('hidden')) {
                 toggleAuthForm(new Event('click'));
             }
         });
